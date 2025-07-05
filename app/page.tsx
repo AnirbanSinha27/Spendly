@@ -15,6 +15,7 @@ import { BudgetForm } from '@/components/budgets/budget-form';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MonthCalendar } from '@/components/ui/month-calendar';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { Transaction } from '@/lib/types';
 import { TrendingUp, Plus, Target, BarChart3, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
@@ -190,15 +191,19 @@ function HomePage() {
 
           <TabsContent value="budgets" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <BudgetForm
-                onSubmit={handleSetBudget}
-                currentMonth={currentMonth}
-              />
-              <DynamicBudgetOverview 
-                transactions={transactions} 
-                budgets={budgets} 
-                currentMonth={currentMonth} 
-              />
+              <ErrorBoundary>
+                <BudgetForm
+                  onSubmit={handleSetBudget}
+                  currentMonth={currentMonth}
+                />
+              </ErrorBoundary>
+              <ErrorBoundary>
+                <DynamicBudgetOverview 
+                  transactions={transactions || []} 
+                  budgets={budgets || []} 
+                  currentMonth={currentMonth} 
+                />
+              </ErrorBoundary>
             </div>
           </TabsContent>
         </Tabs>

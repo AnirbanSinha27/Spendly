@@ -13,7 +13,10 @@ interface BudgetOverviewProps {
 }
 
 export function BudgetOverview({ transactions, budgets, currentMonth }: BudgetOverviewProps) {
-  const currentMonthBudgets = budgets.filter(b => b.month === currentMonth);
+  // Add safety checks for undefined props
+  const safeTransactions = transactions || [];
+  const safeBudgets = budgets || [];
+  const currentMonthBudgets = safeBudgets.filter(b => b.month === currentMonth);
   
   if (currentMonthBudgets.length === 0) {
     return (
@@ -37,7 +40,7 @@ export function BudgetOverview({ transactions, budgets, currentMonth }: BudgetOv
   }
 
   const budgetData = currentMonthBudgets.map(budget => {
-    const spent = transactions
+    const spent = safeTransactions
       .filter(t => 
         t.type === 'expense' && 
         t.date.startsWith(currentMonth) && 
@@ -54,7 +57,7 @@ export function BudgetOverview({ transactions, budgets, currentMonth }: BudgetOv
       percentage: Math.min(percentage, 100),
       remaining: budget.limit - spent,
       status: percentage > 100 ? 'over' : percentage > 80 ? 'warning' : 'good',
-      category: category,
+      category: category || { name: budget.category, icon: '📦', color: '#6B7280' },
     };
   });
 
