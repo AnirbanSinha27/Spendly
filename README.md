@@ -1,0 +1,2 @@
+# Spendly
+Finance Tracking Application
