@@ -87,7 +87,10 @@ export function useTransactions() {
   };
 
   useEffect(() => {
-    fetchTransactions();
+    // Only fetch on client side
+    if (typeof window !== 'undefined') {
+      fetchTransactions();
+    }
   }, []);
 
   return {

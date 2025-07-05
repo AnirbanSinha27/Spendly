@@ -7,6 +7,9 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['mongoose'],
   },
+  // Disable static generation for pages that need dynamic data
+  trailingSlash: false,
+  generateEtags: false,
 };
 
 module.exports = nextConfig;

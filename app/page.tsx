@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useTransactions } from '@/hooks/use-transactions';
 import { useBudgets } from '@/hooks/use-budgets';
 import { SummaryCards } from '@/components/dashboard/summary-cards';
@@ -19,13 +20,25 @@ import { TrendingUp, Plus, Target, BarChart3, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import Image from 'next/image';
 
-export default function Home() {
+// Dynamic imports to prevent SSR issues
+const DynamicSummaryCards = dynamic(() => import('@/components/dashboard/summary-cards').then(mod => ({ default: mod.SummaryCards })), { ssr: false });
+const DynamicMonthlyExpensesChart = dynamic(() => import('@/components/dashboard/monthly-expenses-chart').then(mod => ({ default: mod.MonthlyExpensesChart })), { ssr: false });
+const DynamicCategoryPieChart = dynamic(() => import('@/components/dashboard/category-pie-chart').then(mod => ({ default: mod.CategoryPieChart })), { ssr: false });
+const DynamicBudgetOverview = dynamic(() => import('@/components/dashboard/budget-overview').then(mod => ({ default: mod.BudgetOverview })), { ssr: false });
+const DynamicBudgetVsActualChart = dynamic(() => import('@/components/dashboard/budget-vs-actual-chart').then(mod => ({ default: mod.BudgetVsActualChart })), { ssr: false });
+
+function HomePage() {
   const { transactions, isLoading: transactionsLoading, addTransaction, updateTransaction, deleteTransaction } = useTransactions();
   const { budgets, isLoading: budgetsLoading, setBudget } = useBudgets();
   
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [currentMonth, setCurrentMonth] = useState(format(new Date(), 'yyyy-MM'));
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleAddTransaction = async (transaction: Omit<Transaction, 'id'>) => {
     try {
@@ -69,7 +82,7 @@ export default function Home() {
     }
   };
 
-  if (transactionsLoading || budgetsLoading) {
+  if (!isClient || transactionsLoading || budgetsLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
@@ -118,7 +131,7 @@ export default function Home() {
         </div>
 
         {/* Summary Cards */}
-        <SummaryCards transactions={transactions} currentMonth={currentMonth} />
+        <DynamicSummaryCards transactions={transactions} currentMonth={currentMonth} />
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -147,10 +160,10 @@ export default function Home() {
 
           <TabsContent value="dashboard" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <MonthlyExpensesChart transactions={transactions} />
-              <CategoryPieChart transactions={transactions} currentMonth={currentMonth} />
+              <DynamicMonthlyExpensesChart transactions={transactions} />
+              <DynamicCategoryPieChart transactions={transactions} currentMonth={currentMonth} />
             </div>
-            <BudgetVsActualChart 
+            <DynamicBudgetVsActualChart 
               transactions={transactions} 
               budgets={budgets} 
               currentMonth={currentMonth} 
@@ -181,7 +194,7 @@ export default function Home() {
                 onSubmit={handleSetBudget}
                 currentMonth={currentMonth}
               />
-              <BudgetOverview 
+              <DynamicBudgetOverview 
                 transactions={transactions} 
                 budgets={budgets} 
                 currentMonth={currentMonth} 
@@ -193,3 +206,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default HomePage;

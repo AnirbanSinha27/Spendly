@@ -56,7 +56,10 @@ export function useBudgets() {
   };
 
   useEffect(() => {
-    fetchBudgets();
+    // Only fetch on client side
+    if (typeof window !== 'undefined') {
+      fetchBudgets();
+    }
   }, []);
 
   const getBudget = (category: string, month: string): Budget | undefined => {
