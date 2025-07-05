@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { Transaction, Budget } from '@/lib/types';
 import { getCategoryByName } from '@/lib/categories';
 import { AlertTriangle, CheckCircle, TrendingUp } from 'lucide-react';
@@ -112,13 +111,9 @@ export function BudgetOverview({ transactions, budgets, currentMonth }: BudgetOv
                 </div>
               </div>
             </div>
-            <div className="relative">
-              <Progress 
-                value={budget.percentage} 
-                className="h-2"
-              />
+            <div className="w-full bg-gray-200 rounded-full h-2">
               <div 
-                className={`absolute top-0 left-0 h-2 rounded-full transition-all ${getProgressColor(budget.status)}`}
+                className={`h-2 rounded-full transition-all ${getProgressColor(budget.status)}`}
                 style={{ width: `${Math.min(budget.percentage, 100)}%` }}
               />
             </div>
